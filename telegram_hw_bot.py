@@ -116,10 +116,13 @@ async def handle_text(update: Update, context) -> None:
 import functools
 
 async def get_feedback(task: str) -> str:
-    # оборачиваем sync‑метод в поток, чтобы не блокировать event‑loop
-    response = await asyncio.to_thread(
-        openai.ChatCompletion.create,
-        model="gpt-4o",         
+    system_prompt = (
+        "Ты преподаватель истории Ближнего Востока.\n"
+        "Дай короткий, конструктивный фидбэк (3–5 предложений) на присланную работу."
+    )
+
+    response = await openai.ChatCompletion.acreate(
+        model="gpt-4o-mini",
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": task},
@@ -127,7 +130,8 @@ async def get_feedback(task: str) -> str:
         max_tokens=300,
         temperature=0.4,
     )
-    return response["choices"][0]["message"]["content"].strip()
+    return response.choices[0].message.content.strip()
+
 
 
 # ------------------------------------------------------------
