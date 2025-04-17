@@ -68,7 +68,7 @@ def append_row_to_file(path: str, row: list[str]) -> None:
 # 🤖  Хэндлеры Telegram
 # ------------------------------------------------------------
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def start(update: Update, context) -> None:
     await update.message.reply_text(
         "Привет! Пришлите домашнее задание в формате:\n"
         "ФИО; группа (РГ1/РГ21/РГ22); тип (отработка/доп); № семинара; текст задания"
@@ -77,7 +77,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 
-async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def handle_text(update: Update, context) -> None:
     user = update.effective_user
     raw_text = update.message.text.strip()
 
