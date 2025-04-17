@@ -32,6 +32,10 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+assert BOT_TOKEN, "BOT_TOKEN пустой"
+assert OPENAI_API_KEY, "OPENAI_API_KEY пустой"
+logger.info("Токены загружены, длины: %d / %d", len(BOT_TOKEN), len(OPENAI_API_KEY))
+
 # ------------------------------------------------------------
 # 💾  Работа с CSV‑файлом
 # ------------------------------------------------------------
@@ -109,12 +113,13 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
 # 🔮  Генерация фидбэка
 # ------------------------------------------------------------
 
-async def get_feedback(task: str) -> str:
-    system_prompt = """Ты преподаватель истории Ближнего Востока.
-Дай короткий, конструктивный фидбэк (3–5 предложений) на присланную работу."""
+import functools
 
-    response = await openai.ChatCompletion.acreate(
-        model="gpt-4o-mini",
+async def get_feedback(task: str) -> str:
+    # оборачиваем sync‑метод в поток, чтобы не блокировать event‑loop
+    response = await asyncio.to_thread(
+        openai.ChatCompletion.create,
+        model="gpt-4o",         
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": task},
@@ -122,7 +127,8 @@ async def get_feedback(task: str) -> str:
         max_tokens=300,
         temperature=0.4,
     )
-    return response.choices[0].message.content.strip()
+    return response["choices"][0]["message"]["content"].strip()
+
 
 # ------------------------------------------------------------
 # 🏃‍♂️  Запуск приложения
