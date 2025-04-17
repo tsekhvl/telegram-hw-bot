@@ -6,13 +6,8 @@ import csv
 from datetime import datetime, timezone
 
 from telegram import Update
-from telegram.ext import (
-    ApplicationBuilder,
-    CommandHandler,
-    MessageHandler,
-    ContextTypes,
-    filters,
-)
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters
+
 
 import openai
 
@@ -139,7 +134,7 @@ async def get_feedback(task: str) -> str:
 # 🏃‍♂️  Запуск приложения
 # ------------------------------------------------------------
 
-async def main() -> None:
+def main() -> None:
     if not (BOT_TOKEN and OPENAI_API_KEY):
         raise RuntimeError("BOT_TOKEN и OPENAI_API_KEY должны быть заданы!")
 
@@ -149,10 +144,10 @@ async def main() -> None:
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
 
     logger.info("Бот запущен. Ожидаю сообщения…")
-    await application.run_polling(close_loop=False)
+    application.run_polling()          # ← синхронный, блокирующий вызов
 
 if __name__ == "__main__":
     try:
-        asyncio.run(main())
+        main()                         # без asyncio.run
     except (KeyboardInterrupt, SystemExit):
         logger.info("Бот остановлен.")
