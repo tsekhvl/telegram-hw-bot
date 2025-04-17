@@ -194,6 +194,7 @@ def main() -> None:
 
     application.add_handler(CommandHandler("start", start))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
+    application.add_handler(CommandHandler("собрать", collect_today))
 
     logger.info("Бот запущен. Ожидаю сообщения…")
     application.run_polling()          # ← синхронный, блокирующий вызов
