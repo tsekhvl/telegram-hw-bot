@@ -108,11 +108,8 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
 # ------------------------------------------------------------
 
 async def get_feedback(task: str) -> str:
-    system_prompt = (
-        "Ты преподаватель истории Ближнего Востока. 
-"
-        "Дай короткий, конструктивный фидбэк (3‑5 предложений) на присланную работу."
-    )
+    system_prompt = """Ты преподаватель истории Ближнего Востока.
+Дай короткий, конструктивный фидбэк (3–5 предложений) на присланную работу."""
 
     response = await openai.ChatCompletion.acreate(
         model="gpt-4o-mini",
