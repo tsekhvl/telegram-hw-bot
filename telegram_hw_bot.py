@@ -81,14 +81,18 @@ async def handle_text(update: Update, context) -> None:
     user = update.effective_user
     raw_text = update.message.text.strip()
 
-    parts = [p.strip() for p in raw_text.split(";", maxsplit=4)]
-    if len(parts) < 5:
+    parts = [p.strip() for p in raw_text.strip().split(";")]
+    
+    if len(parts) != 5:
         await update.message.reply_text(
-            "⚠️ Неверный формат. Должно быть 5 полей, разделённых ‘;’."
+            "⚠️ Неверный формат.\n"
+            "Формат должен быть такой:\n"
+            "ФИО; группа; тип (отработка/доп); № семинара; текст задания"
         )
         return
-
+    
     fio, group, task_type, seminar_no, task_text = parts
+
 
     feedback = await get_feedback(task_text)
     await update.message.reply_text(feedback)
