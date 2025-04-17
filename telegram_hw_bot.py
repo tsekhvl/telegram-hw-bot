@@ -16,6 +16,11 @@ from telegram.ext import (
 
 import openai
 
+print("=== ENV DEBUG ===")
+for k in ("BOT_TOKEN", "OPENAI_API_KEY"):
+    print(k, repr(os.environ.get(k)))
+print("=================")
+
 # ------------------------------------------------------------
 # 🗂️  Конфигурация
 # ------------------------------------------------------------
