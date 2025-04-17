@@ -132,6 +132,50 @@ async def get_feedback(task: str) -> str:
     )
     return response.choices[0].message.content.strip()
 
+# ------------------------------------------------------------
+# Сбор результатов
+# ------------------------------------------------------------
+
+from io import StringIO
+from telegram.constants import ChatAction
+
+# 🔐 Подставь сюда свой Telegram ID (число, не строка)
+YOUR_TELEGRAM_ID = 415738479
+
+async def collect_today(update: Update, context) -> None:
+    if update.effective_user.id != YOUR_TELEGRAM_ID:
+        await update.message.reply_text("Извините, доступ только для преподавателя.")
+        return
+
+    await update.message.chat.send_action(action=ChatAction.TYPING)
+
+    today = datetime.now(timezone.utc).date()
+    collected = []
+
+    try:
+        with open(LOG_FILE_PATH, "r", encoding="utf-8") as f:
+            reader = csv.reader(f)
+            headers = next(reader)
+            for row in reader:
+                timestamp_str = row[0]
+                timestamp = datetime.fromisoformat(timestamp_str)
+                if timestamp.date() == today:
+                    collected.append(row)
+
+        if not collected:
+            await update.message.reply_text("Сегодняшних ответов пока нет.")
+            return
+
+        output = StringIO()
+        writer = csv.writer(output)
+        writer.writerow(headers)
+        writer.writerows(collected)
+        output.seek(0)
+
+        await update.message.reply_document(document=output, filename=f"ответы_{today}.csv")
+
+    except Exception as e:
+        await update.message.reply_text(f"Ошибка при сборе: {e}")
 
 
 # ------------------------------------------------------------
